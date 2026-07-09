@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intern Hiring Test — Mini Exception Inbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #F7F7F5;
+    --surface-1: #FFFFFF;
+    --surface-2: #F0F0F0;
+    --surface-3: #E7E5E4;
+    --ink: #1A1A1A;
+    --ink-strong: #0A0A0A;
+    --ink-muted: #6B6B6B;
+    --ink-subtle: #9A9A9A;
+    --brand: #C45C26;
+    --brand-hover: #A84B1F;
+    --brand-soft: #F2DBCC;
+    --brand-on: #FFFFFF;
+    --brand-secondary: #D4A574;
+    --signal-positive: #3D7A3D;
+    --signal-warning: #C49426;
+    --signal-critical: #A84B1F;
+    --data-1: #C45C26;
+    --data-2: #D4A574;
+    --data-3: #1A1A1A;
+    --data-4: #6B6B6B;
+    --data-5: #E7E5E4;
+    --hairline: rgba(26,26,26,0.08) 0 0 0 1px;
+    --hairline-strong: rgba(26,26,26,0.16) 0 0 0 1px;
+    --card: rgba(26,26,26,0.08) 0 0 0 1px, rgba(26,26,26,0.04) 0 2px 2px;
+    --card-lifted: rgba(26,26,26,0.08) 0 0 0 1px, rgba(26,26,26,0.04) 0 2px 2px, rgba(26,26,26,0.04) 0 8px 12px -6px, #FAFAFA 0 0 0 1px inset;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: "Geist", "Inter", "SF Pro Display", -apple-system, system-ui, sans-serif;
+    background: var(--canvas);
+    color: var(--ink);
+    line-height: 1.55;
+    letter-spacing: -0.05px;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 64px 24px 96px; }
+
+  /* Header */
+  .header { margin-bottom: 48px; text-align: center; }
+  .header-eyebrow {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.6px;
+    text-transform: uppercase; color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+  .header-title {
+    font-size: 48px; font-weight: 600; line-height: 1.10;
+    letter-spacing: -1.8px; color: var(--ink-strong);
+    margin-bottom: 12px;
+  }
+  .header-sub {
+    font-size: 18px; font-weight: 400; line-height: 1.55;
+    letter-spacing: -0.1px; color: var(--ink-muted);
+    max-width: 640px; margin: 0 auto;
+  }
+  .header-deadline {
+    display: inline-block;
+    margin-top: 20px;
+    background: var(--surface-1);
+    box-shadow: var(--hairline);
+    border-radius: var(--radius-pill, 9999px);
+    padding: 6px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+  .header-deadline strong { color: var(--brand); }
+
+  /* Section */
+  .section { margin-bottom: 40px; }
+  .section-number {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.6px;
+    text-transform: uppercase; color: var(--brand);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-size: 28px; font-weight: 600; line-height: 1.20;
+    letter-spacing: -0.6px; color: var(--ink-strong);
+    margin-bottom: 16px;
+  }
+  .section-body { font-size: 16px; color: var(--ink); }
+  .section-body p { margin-bottom: 12px; }
+  .section-body p:last-child { margin-bottom: 0; }
+
+  /* Card */
+  .card {
+    background: var(--surface-1);
+    box-shadow: var(--card-lifted);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 22px; font-weight: 500; line-height: 1.25;
+    letter-spacing: -0.4px; margin-bottom: 12px;
+  }
+  .card-body { font-size: 15px; color: var(--ink); line-height: 1.55; }
+
+  /* Sub-card */
+  .sub-card {
+    background: var(--canvas);
+    box-shadow: var(--hairline);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .sub-card:last-child { margin-bottom: 0; }
+  .sub-card-title {
+    font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--ink-strong);
+  }
+
+  /* Lists */
+  .task-list { list-style: none; counter-reset: task; }
+  .task-list > li {
+    counter-increment: task;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--surface-3);
+    position: relative;
+    padding-left: 44px;
+  }
+  .task-list > li:last-child { border-bottom: none; }
+  .task-list > li::before {
+    content: counter(task);
+    position: absolute; left: 0; top: 20px;
+    width: 28px; height: 28px;
+    background: var(--brand-soft);
+    color: var(--brand-hover);
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+  }
+  .task-label { font-weight: 500; font-size: 16px; margin-bottom: 4px; }
+  .task-desc { font-size: 14px; color: var(--ink-muted); line-height: 1.50; }
+
+  .dot-list { list-style: none; }
+  .dot-list li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
+  .dot-list li::before {
+    content: "";
+    position: absolute; left: 0; top: 13px;
+    width: 6px; height: 6px;
+    background: var(--data-4);
+    border-radius: 50%;
+  }
+  .dot-list li strong { color: var(--ink); }
+
+  /* Code */
+  code {
+    font-family: "Geist Mono", "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+    font-size: 13px;
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--brand-hover);
+  }
+  pre {
+    font-family: "Geist Mono", "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+    font-size: 13px;
+    background: var(--surface-2);
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.55;
+    box-shadow: var(--hairline);
+  }
+  .inline-highlight {
+    background: var(--brand-soft);
+    color: var(--brand-hover);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    background: var(--brand-soft);
+    color: var(--brand-hover);
+    font-size: 12px; font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    letter-spacing: 0;
+  }
+  .badge-required { background: #FEE2E2; color: #991B1B; }
+  .badge-bonus { background: #DCFCE7; color: #166534; }
+
+  /* Delivery box */
+  .delivery-box {
+    background: var(--surface-1);
+    box-shadow: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--brand);
+  }
+  .delivery-box h4 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+  .delivery-box p, .delivery-box li { font-size: 14px; color: var(--ink-muted); line-height: 1.50; }
+
+  /* Rules */
+  .rules-box {
+    background: var(--surface-inverse, #1A1A1A);
+    color: var(--ink-on-dark, #F7F7F5);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    margin-bottom: 20px;
+  }
+  .rules-box p { font-size: 15px; line-height: 1.55; margin-bottom: 12px; letter-spacing: -0.02px; }
+  .rules-box p:last-child { margin-bottom: 0; }
+  .rules-box a { color: var(--brand-secondary); }
+  .rules-box .highlight { color: var(--brand-secondary); font-weight: 500; }
+
+  /* Attribution */
+  .attribution {
+    font-size: 12px; color: var(--ink-subtle);
+    text-align: center;
+    padding-top: 48px;
+    border-top: 1px solid var(--surface-3);
+    margin-top: 16px;
+    line-height: 1.60;
+  }
+
+  /* hr */
+  hr { border: none; border-top: 1px solid var(--surface-3); margin: 32px 0; }
+
+  /* Template link */
+  .template-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500;
+    color: var(--brand);
+    text-decoration: none;
+    padding: 4px 12px;
+    background: var(--brand-soft);
+    border-radius: var(--radius-sm);
+  }
+  .template-link:hover { background: #E8C9B4; }
+
+  /* File list */
+  .file-list { list-style: none; }
+  .file-list li {
+    font-family: "Geist Mono", "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+    font-size: 13px;
+    padding: 4px 0;
+    color: var(--ink-muted);
+  }
+  .file-list li::before { content: "→ "; color: var(--brand); }
+
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px 64px; }
+    .header-title { font-size: 32px; letter-spacing: -1.2px; }
+    .header-sub { font-size: 16px; }
+    .card { padding: 20px; }
+    .rules-box { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-eyebrow">Intern Hiring Test</div>
+    <h1 class="header-title">Mini Exception Inbox</h1>
+    <p class="header-sub">Ingest messy factory data, detect deficits, serve through an API, and render a timeline inbox.</p>
+    <div class="header-deadline"><strong>Deadline:</strong> 4 days from receipt.</div>
+  </div>
+
+  <!-- Context -->
+  <div class="section">
+    <div class="section-number">Context</div>
+    <div class="section-body">
+      <p>Factory data is messy. Turning it into decisions is the job. Instead of dashboards that show planners 500 alerts a day, the system we're building reasons across disruptions and writes the response back into the ERP. That means every piece of code — from data pipelines to API endpoints to the UI a planner clicks through — has to handle real-world messiness.</p>
+      <p>This test is a miniature of that exact work. You're given two CSV files derived from real (Kaggle) store-item demand data, reframed as a manufacturing scenario: a <strong>production plan</strong> (what we said we'd make) and <strong>actual production</strong> (what we actually made). The gap between them — exceptions — is what needs to surface in an inbox someone acts on.</p>
+    </div>
+  </div>
+
+  <!-- The Task -->
+  <div class="section">
+    <div class="section-number">The Task</div>
+    <h2 class="section-title">Build a Mini Exception Inbox</h2>
+
+    <ol class="task-list">
+      <li>
+        <div class="task-label">Ingest</div>
+        <div class="task-desc">Load both CSVs into a relational database. Keep raw data and cleaned data separable (separate raw vs clean tables, or an equivalent pattern).</div>
+        <ul class="file-list" style="margin-top:8px">
+          <li>actual_production.csv — daily units actually produced</li>
+          <li>production_plan.csv — daily planned production</li>
+        </ul>
+      </li>
+      <li>
+        <div class="task-label">Detect Exceptions</div>
+        <div class="task-desc">A <strong>deficit exception</strong> exists for a given product on a given day when <code>units_produced &lt; 0.9 × planned_units</code>. Severity: <span class="inline-highlight">high</span> if <code>units_produced &lt; 0.7 × planned_units</code>, otherwise <span class="inline-highlight">medium</span>. Exceptions <strong>must be materialized as rows</strong> in a database table with a <code>status</code> column (<code>open</code>, <code>acknowledged</code>, <code>resolved</code>).</div>
+      </li>
+      <li>
+        <div class="task-label">API</div>
+        <div class="task-desc">Build a REST API (any language — FastAPI/Python scores familiarity points):</div>
+        <ul class="dot-list" style="margin-top:6px">
+          <li><strong>GET /exceptions</strong> — list, filterable by <code>product_code</code> and <code>severity</code>, sorted by date descending (worst deficit first within day)</li>
+          <li><strong>GET /exceptions/{id}</strong> — detail with planned, actual, deficit %, and last-7-days trend</li>
+          <li><strong>PATCH /exceptions/{id}</strong> — set status to <code>acknowledged</code> or <code>resolved</code>; must persist</li>
+        </ul>
+      </li>
+      <li>
+        <div class="task-label">Frontend</div>
+        <div class="task-desc">Build a <strong>day-by-day timeline inbox</strong> (React preferred, any framework accepted):</div>
+        <ul class="dot-list" style="margin-top:6px">
+          <li>Exceptions grouped by date (newest first), worst deficit first within each day</li>
+          <li>Collapsible day groups</li>
+          <li>Severity badges + filters (by product, by severity) across the timeline</li>
+          <li>Click → detail panel with numbers and 7-day trend (table or chart)</li>
+          <li>Acknowledge/resolve without full page reload</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <!-- Data Files -->
+  <div class="section">
+    <div class="section-number">Data</div>
+    <h2 class="section-title">Provided Files</h2>
+    <div class="card">
+      <div class="sub-card">
+        <div class="sub-card-title">actual_production.csv <span class="badge" style="margin-left:6px">Clean</span></div>
+        <div style="font-size:13px; color:var(--ink-muted)">1,080 rows · Columns: date, plant_id, product_code, units_produced</div>
+      </div>
+      <div class="sub-card">
+        <div class="sub-card-title">production_plan.csv</div>
+        <div style="font-size:13px; color:var(--ink-muted)">~1,085 rows · Columns: plan_date, plant, sku, planned_units</div>
+      </div>
+      <p style="font-size:13px; color:var(--ink-muted); margin-top:12px"><strong>Note:</strong> Column names differ between the two CSVs — you'll need to map them. Look at the data before you load it.</p>
+    </div>
+  </div>
+
+  <!-- Submission -->
+  <div class="section">
+    <div class="section-number">Submission</div>
+    <h2 class="section-title">What to Submit</h2>
+
+    <div class="delivery-box">
+      <h4>1. Code Archive</h4>
+      <p>GitHub link or zip file. One command to run everything in <code>README.md</code>; <code>docker-compose up</code> is a bonus.</p>
+    </div>
+
+    <div class="delivery-box">
+      <h4>2. Presentation</h4>
+      <p><strong>5–10 minutes max</strong> — PPT, video, HTML page, or any format you're comfortable with, covering:</p>
+      <ul class="dot-list" style="margin-top:6px">
+        <li>Demo of the app working end-to-end</li>
+        <li>Walkthrough of your database schema and key decisions</li>
+        <li>Explanation of your process: what you did, what you found in the data, tradeoffs you made</li>
+        <li>Walkthrough of your <strong>process flow diagram</strong></li>
+        <li>Anything you'd do differently</li>
+      </ul>
+    </div>
+
+    <div class="delivery-box">
+      <h4>Inside the Code Archive — Supporting Documents</h4>
+      <ul class="dot-list" style="margin-top:6px">
+        <li><strong>APPROACH.md</strong> — use <code>templates/APPROACH_TEMPLATE.md</code> (~1 page). Include a <strong>process flow diagram</strong> showing your pipeline from data to UI.</li>
+        <li><strong>AI_USAGE.md</strong> — use <code>templates/AI_USAGE_TEMPLATE.md</code>. <span class="badge badge-required">Mandatory & Graded</span> Tools used, key prompts verbatim, where AI was wrong, % split.</li>
+        <li><strong>README.md</strong> — architecture overview (use <code>templates/ARCHITECTURE_README_TEMPLATE.md</code> if helpful). Include a <strong>system architecture diagram</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <div class="section">
+    <div class="section-number">Resources</div>
+    <h2 class="section-title">Templates</h2>
+    <div class="card">
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px">
+        <span class="template-link">📄 APPROACH_TEMPLATE.md</span>
+        <span class="template-link">📄 AI_USAGE_TEMPLATE.md</span>
+        <span class="template-link">📄 ARCHITECTURE_README_TEMPLATE.md</span>
+        <span class="template-link">📄 INSTRUCTIONS.html</span>
+      </div>
+      <p style="font-size:14px; color:var(--ink-muted)">All templates are in the <code>templates/</code> folder. A markdown version of these instructions is in <code>ASSIGNMENT.md</code>.</p>
+    </div>
+  </div>
+
+  <!-- Scoring -->
+  <div class="section">
+    <div class="section-number">Scoring</div>
+    <h2 class="section-title">What Matters</h2>
+    <p class="section-body" style="margin-bottom:16px">We evaluate submissions on five dimensions (in priority order):</p>
+    <div style="display:grid; gap:12px">
+      <div style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--surface-2); border-radius:var(--radius-md)">
+        <span style="background:var(--brand); color:white; font-size:12px; font-weight:600; width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; margin-top:1px">1</span>
+        <div><strong>Data &amp; database</strong> — Did you inspect the data, handle its quirks, and design a sensible schema?</div>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--surface-2); border-radius:var(--radius-md)">
+        <span style="background:var(--brand); color:white; font-size:12px; font-weight:600; width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; margin-top:1px">2</span>
+        <div><strong>Backend completeness</strong> — Working API with correct exception counts, filtering, and status mutation.</div>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--surface-2); border-radius:var(--radius-md)">
+        <span style="background:var(--brand); color:white; font-size:12px; font-weight:600; width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; margin-top:1px">3</span>
+        <div><strong>Frontend</strong> — Inbox works end-to-end, detail view is correct, status updates without reload.</div>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--surface-2); border-radius:var(--radius-md)">
+        <span style="background:var(--brand); color:white; font-size:12px; font-weight:600; width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; margin-top:1px">4</span>
+        <div><strong>AI usage quality</strong> — Quality of prompts, evidence of verifying AI output, honest reporting.</div>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; padding:12px 16px; background:var(--surface-2); border-radius:var(--radius-md)">
+        <span style="background:var(--brand); color:white; font-size:12px; font-weight:600; width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; margin-top:1px">5</span>
+        <div><strong>Communication</strong> — Clear approach doc, architecture diagram, and presentation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rules -->
+  <div class="section">
+    <div class="section-number">Rules</div>
+    <h2 class="section-title">Expectations</h2>
+    <div class="rules-box">
+      <p>Using AI (Claude Code, Cursor, ChatGPT, Copilot&hellip;) is <span class="highlight">expected and encouraged</span>. We are evaluating how well you drive it, not whether you avoided it. Hiding AI use, or an empty <code>AI_USAGE.md</code>, is a rejection signal.</p>
+      <p><span class="highlight">If you're looking for AI help:</span> <a href="https://opencode.ai">Open Code</a> has free built-in LLMs (DeepSeek V4 Flash Free, Nemotron Ultra) that are enough to get the work done. If you already have a subscription to another tool, use whatever you're comfortable with.</p>
+      <p><span class="highlight">One hint:</span> Look at the data before you load it.</p>
+    </div>
+  </div>
+
+  <!-- Data Attribution -->
+  <div class="attribution">
+    Dataset derived from the <a href="https://www.kaggle.com/c/demand-forecasting-kernels-only" style="color:var(--brand)">Store Item Demand Forecasting Challenge</a> (Kaggle). Licensed under the competition rules.<br>
+    
+  </div>
+
+</div>
+</body>
+</html>
