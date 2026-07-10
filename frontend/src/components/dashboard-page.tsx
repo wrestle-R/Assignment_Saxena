@@ -140,11 +140,6 @@ export function DashboardPage({
       <FloatingNavbar
         eyebrow="Saxena"
         title=""
-        primaryActionLabel="Jump to filters"
-        onPrimaryAction={() => {
-          const element = document.getElementById("dashboard-filters")
-          element?.scrollIntoView({ behavior: "smooth", block: "start" })
-        }}
         onLogout={onLogout}
       />
 
@@ -777,6 +772,18 @@ function DataQualityDetailModal({
     },
   })
 
+  useEffect(() => {
+    if (!detailQuery.data) {
+      return
+    }
+
+    setEditedDate(detailQuery.data.date || "")
+    setEditedProductCode(detailQuery.data.productCode || "")
+    setEditedSourceTable(detailQuery.data.sourceTable || "")
+    setEditedDescription(detailQuery.data.description)
+    setEditedRawRows(normalizeEditableRows(detailQuery.data.rawRows))
+  }, [detailQuery.data])
+
   if (!selectedId) {
     return null
   }
@@ -796,21 +803,6 @@ function DataQualityDetailModal({
 
   const issue = detailQuery.data
   const evidenceCards = issue.rawRows.length > 0 ? issue.rawRows : [{}]
-
-  useEffect(() => {
-    setEditedDate(issue.date || "")
-    setEditedProductCode(issue.productCode || "")
-    setEditedSourceTable(issue.sourceTable || "")
-    setEditedDescription(issue.description)
-    setEditedRawRows(normalizeEditableRows(issue.rawRows))
-  }, [
-    issue.id,
-    issue.date,
-    issue.productCode,
-    issue.sourceTable,
-    issue.description,
-    issue.rawRows,
-  ])
 
   const handleRawRowChange = (
     rowIndex: number,

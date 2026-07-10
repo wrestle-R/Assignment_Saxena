@@ -217,9 +217,11 @@ describe("App", () => {
 
       if (url.includes("/api/data-quality-issues/dq-1") && init?.method === "PATCH") {
         const nextStatus = JSON.parse(String(init.body)).status
+        const payload = JSON.parse(String(init.body))
         issue = {
           ...issue,
-          status: nextStatus,
+          ...payload,
+          status: payload.status,
         }
         return jsonResponse({
           body: {
@@ -254,13 +256,8 @@ describe("App", () => {
 
     const panel = await screen.findByRole("dialog", { name: /issue detail/i })
     expect(within(panel).getByText(/plan row has a blank planned_units value/i)).toBeInTheDocument()
-    expect(
-      within(panel).getByText(
-        (content, element) =>
-          element?.tagName.toLowerCase() === "pre" &&
-          content.includes('"planned_units"')
-      )
-    ).toBeInTheDocument()
+    expect(within(panel).getByText(/evidence cards/i)).toBeInTheDocument()
+    expect(within(panel).getAllByText(/planned units/i).length).toBeGreaterThan(0)
 
     await userEvent.click(within(panel).getByRole("button", { name: /resolve/i }))
 
