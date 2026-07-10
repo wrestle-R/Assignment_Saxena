@@ -13,10 +13,6 @@ The data flow is:
 5. Data-quality issues are stored separately so they do not pollute the exception math.
 6. The React dashboard reads the API and lets the reviewer filter, inspect, and update status.
 
-## Architecture diagram
-
-![Architecture diagram](docs/architecture.svg)
-
 ## Table design
 
 The database is split into a few small collections:
