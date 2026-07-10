@@ -63,17 +63,63 @@ async function getExceptionDetail(req, res) {
 }
 
 async function updateExceptionStatus(req, res) {
-  const { status } = req.body || {}
-  if (!["acknowledged", "resolved"].includes(status)) {
+  const { status, date, plannedUnits, actualUnits } = req.body || {}
+  if (!["open", "acknowledged", "resolved"].includes(status)) {
     throw createHttpError(
       400,
-      "Status must be either acknowledged or resolved"
+      "Status must be open, acknowledged, or resolved"
     )
+  }
+
+  const update = { status }
+
+  if (status === "resolved") {
+    if (date !== undefined) {
+      if (typeof date !== "string" || !date.trim()) {
+        throw createHttpError(400, "Resolved exception date must be a non-empty string")
+      }
+      update.date = date.trim()
+    }
+
+    if (plannedUnits !== undefined) {
+      if (!Number.isFinite(plannedUnits) || plannedUnits < 0) {
+        throw createHttpError(400, "Planned units must be a valid non-negative number")
+      }
+      update.plannedUnits = plannedUnits
+    }
+
+    if (actualUnits !== undefined) {
+      if (!Number.isFinite(actualUnits) || actualUnits < 0) {
+        throw createHttpError(400, "Actual units must be a valid non-negative number")
+      }
+      update.actualUnits = actualUnits
+    }
+  }
+
+  if (
+    update.plannedUnits !== undefined ||
+    update.actualUnits !== undefined
+  ) {
+    const nextPlannedUnits = update.plannedUnits
+    const nextActualUnits = update.actualUnits
+    const baseException = await Exception.findById(req.params.id).lean()
+
+    if (!baseException) {
+      throw createHttpError(404, "Exception not found")
+    }
+
+    const planned = nextPlannedUnits ?? baseException.plannedUnits
+    const actual = nextActualUnits ?? baseException.actualUnits
+    const deficitPct =
+      planned > 0 ? Number((((planned - actual) / planned) * 100).toFixed(1)) : 0
+
+    update.deficitPct = deficitPct
+    update.severity = deficitPct >= 30 ? "high" : "medium"
   }
 
   const exception = await Exception.findByIdAndUpdate(
     req.params.id,
-    { status },
+    update,
     { returnDocument: "after" }
   ).lean()
 

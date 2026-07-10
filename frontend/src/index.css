@@ -2,12 +2,15 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+@import "@fontsource/montserrat/500.css";
+@import "@fontsource/montserrat/600.css";
+@import "@fontsource/montserrat/700.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: Inter, -apple-system, sans-serif;
+    --font-heading: var(--font-serif);
+    --font-sans: InterVariable, Inter, -apple-system, sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -47,7 +50,7 @@
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
     --font-mono: JetBrains Mono, monospace;
-    --font-serif: Georgia, serif;
+    --font-serif: Montserrat, Inter, -apple-system, sans-serif;
     --radius: 0.75rem;
     --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
     --tracking-tight: calc(var(--tracking-normal) - 0.025em);
@@ -108,8 +111,8 @@
     --sidebar-border: oklch(0.8986 0.0258 97.1423);
     --sidebar-ring: oklch(0.7414 0.0738 84.5946);
     --destructive-foreground: oklch(1.0000 0 0);
-    --font-sans: Inter, -apple-system, sans-serif;
-    --font-serif: Georgia, serif;
+    --font-sans: InterVariable, Inter, -apple-system, sans-serif;
+    --font-serif: Montserrat, Inter, -apple-system, sans-serif;
     --font-mono: JetBrains Mono, monospace;
     --shadow-color: #000000;
     --shadow-opacity: 0.05;
@@ -164,8 +167,8 @@
     --sidebar-ring: oklch(0.8039 0.0702 84.7579);
     --destructive-foreground: oklch(0.9755 0.0067 97.3510);
     --radius: 0.75rem;
-    --font-sans: Inter, -apple-system, sans-serif;
-    --font-serif: Georgia, serif;
+    --font-sans: InterVariable, Inter, -apple-system, sans-serif;
+    --font-serif: Montserrat, Inter, -apple-system, sans-serif;
     --font-mono: JetBrains Mono, monospace;
     --shadow-color: #000000;
     --shadow-opacity: 0.4;
@@ -191,9 +194,20 @@
     }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
     letter-spacing: var(--tracking-normal);
+    font-feature-settings: "ss01" 1, "cv01" 1, "cv02" 1;
     }
   html {
     @apply font-sans;
     }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.03em;
+  }
 }

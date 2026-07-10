@@ -14,6 +14,13 @@ export type ExceptionItem = {
   status: "open" | "acknowledged" | "resolved"
 }
 
+export type ExceptionUpdateInput = {
+  status: "open" | "acknowledged" | "resolved"
+  date?: string
+  plannedUnits?: number
+  actualUnits?: number
+}
+
 export type TrendPoint = {
   date: string
   plannedUnits: number | null
@@ -41,4 +48,13 @@ export type DataQualityIssue = {
   status: "open" | "acknowledged" | "resolved"
   rawRows: Array<Record<string, unknown>>
   metadata?: Record<string, unknown>
+}
+
+export type DataQualityIssueUpdateInput = {
+  status: "open" | "acknowledged" | "resolved"
+  date?: string | null
+  productCode?: string | null
+  sourceTable?: string
+  description?: string
+  rawRows?: Array<Record<string, unknown>>
 }

@@ -1,12 +1,12 @@
 import { LogOut, MoonStar, SunMedium } from "lucide-react"
-import { motion, useMotionValueEvent, useScroll } from "framer-motion"
-import { useRef, useState } from "react"
+import { motion } from "framer-motion"
+import { useRef } from "react"
 
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
 
 type FloatingNavbarProps = {
-  title: string
+  title?: string
   eyebrow: string
   primaryActionLabel?: string
   onPrimaryAction?: () => void
@@ -20,58 +20,78 @@ export function FloatingNavbar({
   onPrimaryAction,
   onLogout,
 }: FloatingNavbarProps) {
-  const ref = useRef<HTMLDivElement | null>(null)
   const { theme, setTheme } = useTheme()
-  const [compact, setCompact] = useState(false)
-  const { scrollY } = useScroll()
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setCompact(latest > 48)
-  })
-
+  const themeToggleRef = useRef<HTMLButtonElement | null>(null)
   const nextTheme = theme === "dark" ? "light" : "dark"
 
   return (
-    <motion.div ref={ref} className="sticky top-4 z-40">
-      <motion.div
-        animate={{
-          y: compact ? 6 : 0,
-          width: compact ? "min(72rem, 92vw)" : "min(78rem, 96vw)",
-          backdropFilter: compact ? "blur(18px)" : "blur(10px)",
-        }}
-        transition={{ type: "spring", stiffness: 260, damping: 24 }}
-        className="mx-auto flex items-center justify-between gap-4 rounded-full border border-white/10 bg-[color-mix(in_oklch,var(--color-card),transparent_18%)] px-4 py-3 shadow-2xl shadow-black/8 sm:px-6"
-      >
+    <motion.header
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="sticky top-0 z-40 border-b border-border/70 bg-background/88 backdrop-blur-md"
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-muted-foreground">
+          <p className="text-sm font-semibold uppercase tracking-[0.34em] text-muted-foreground sm:text-base">
             {eyebrow}
           </p>
-          <h1 className="truncate text-sm font-semibold tracking-wide sm:text-base">
-            {title}
-          </h1>
+          {title ? (
+            <h1 className="mt-1 truncate text-2xl leading-none font-semibold sm:text-[2rem]">
+              {title}
+            </h1>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-2">
           {primaryActionLabel && onPrimaryAction ? (
-            <Button onClick={onPrimaryAction} size="sm" variant="outline">
+            <Button
+              onClick={onPrimaryAction}
+              size="sm"
+              variant="ghost"
+              className="rounded-full px-4"
+            >
               {primaryActionLabel}
             </Button>
           ) : null}
           {onLogout ? (
-            <Button onClick={onLogout} size="icon-sm" variant="outline" aria-label="Log out">
+            <Button
+              onClick={onLogout}
+              size="icon-sm"
+              variant="ghost"
+              aria-label="Log out"
+              className="rounded-full"
+            >
               <LogOut className="size-4" />
             </Button>
           ) : null}
           <Button
-            onClick={() => setTheme(nextTheme)}
+            ref={themeToggleRef}
+            onClick={() => {
+              const bounds = themeToggleRef.current?.getBoundingClientRect()
+
+              setTheme(nextTheme, {
+                origin: bounds
+                  ? {
+                      x: bounds.left + bounds.width / 2,
+                      y: bounds.top + bounds.height / 2,
+                    }
+                  : undefined,
+              })
+            }}
             size="icon-sm"
-            variant="outline"
+            variant="ghost"
             aria-label="Toggle theme"
+            className="rounded-full"
           >
-            {theme === "dark" ? <SunMedium className="size-4" /> : <MoonStar className="size-4" />}
+            {theme === "dark" ? (
+              <SunMedium className="size-4" />
+            ) : (
+              <MoonStar className="size-4" />
+            )}
           </Button>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </motion.header>
   )
 }

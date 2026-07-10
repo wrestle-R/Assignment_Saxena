@@ -99,19 +99,39 @@ describe("API contracts", () => {
       actualUnits: firstItem.actualUnits,
     })
 
-    const patchResponse = await request(app)
+    const resolveResponse = await request(app)
       .patch(`/api/exceptions/${firstItem.id}`)
-      .send({ status: "acknowledged" })
+      .send({
+        status: "resolved",
+        date: "2017-03-31",
+        plannedUnits: 100,
+        actualUnits: 80,
+      })
       .set("Cookie", cookie)
 
-    expect(patchResponse.status).toBe(200)
-    expect(patchResponse.body.exception.status).toBe("acknowledged")
+    expect(resolveResponse.status).toBe(200)
+    expect(resolveResponse.body.exception.status).toBe("resolved")
+    expect(resolveResponse.body.exception.date).toBe("2017-03-31")
+    expect(resolveResponse.body.exception.plannedUnits).toBe(100)
+    expect(resolveResponse.body.exception.actualUnits).toBe(80)
+    expect(resolveResponse.body.exception.deficitPct).toBe(20)
+    expect(resolveResponse.body.exception.severity).toBe("medium")
 
     const refetchResponse = await request(app)
       .get(`/api/exceptions/${firstItem.id}`)
       .set("Cookie", cookie)
 
-    expect(refetchResponse.body.exception.status).toBe("acknowledged")
+    expect(refetchResponse.body.exception.status).toBe("resolved")
+    expect(refetchResponse.body.exception.plannedUnits).toBe(100)
+    expect(refetchResponse.body.exception.actualUnits).toBe(80)
+
+    const reopenResponse = await request(app)
+      .patch(`/api/exceptions/${firstItem.id}`)
+      .send({ status: "open" })
+      .set("Cookie", cookie)
+
+    expect(reopenResponse.status).toBe(200)
+    expect(reopenResponse.body.exception.status).toBe("open")
   })
 
   test("lists, details, and updates data-quality issues separately from exceptions", async () => {
@@ -140,10 +160,37 @@ describe("API contracts", () => {
 
     const patchResponse = await request(app)
       .patch(`/api/data-quality-issues/${issue.id}`)
-      .send({ status: "resolved" })
+      .send({
+        status: "resolved",
+        date: "2017-03-31",
+        productCode: "FG-004",
+        sourceTable: "production_plan",
+        description: "Duplicate plan rows corrected.",
+        rawRows: [
+          {
+            plan_date: "2017-03-31",
+            plant: "PLANT-1",
+            sku: "FG-004",
+            planned_units: "15.0",
+          },
+        ],
+      })
       .set("Cookie", cookie)
 
     expect(patchResponse.status).toBe(200)
     expect(patchResponse.body.issue.status).toBe("resolved")
+    expect(patchResponse.body.issue.date).toBe("2017-03-31")
+    expect(patchResponse.body.issue.productCode).toBe("FG-004")
+    expect(patchResponse.body.issue.sourceTable).toBe("production_plan")
+    expect(patchResponse.body.issue.description).toBe("Duplicate plan rows corrected.")
+    expect(patchResponse.body.issue.rawRows).toHaveLength(1)
+
+    const reopenResponse = await request(app)
+      .patch(`/api/data-quality-issues/${issue.id}`)
+      .send({ status: "open" })
+      .set("Cookie", cookie)
+
+    expect(reopenResponse.status).toBe(200)
+    expect(reopenResponse.body.issue.status).toBe("open")
   })
 })

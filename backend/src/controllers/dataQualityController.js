@@ -39,17 +39,63 @@ async function getDataQualityIssueDetail(req, res) {
 }
 
 async function updateDataQualityIssueStatus(req, res) {
-  const { status } = req.body || {}
-  if (!["acknowledged", "resolved"].includes(status)) {
+  const {
+    status,
+    date,
+    productCode,
+    sourceTable,
+    description,
+    rawRows,
+  } = req.body || {}
+  if (!["open", "acknowledged", "resolved"].includes(status)) {
     throw createHttpError(
       400,
-      "Status must be either acknowledged or resolved"
+      "Status must be open, acknowledged, or resolved"
     )
+  }
+
+  const update = { status }
+
+  if (status === "resolved") {
+    if (date !== undefined) {
+      if (date !== null && typeof date !== "string") {
+        throw createHttpError(400, "Date must be a string or null")
+      }
+      update.date = typeof date === "string" ? date.trim() : null
+    }
+
+    if (productCode !== undefined) {
+      if (productCode !== null && typeof productCode !== "string") {
+        throw createHttpError(400, "Product code must be a string or null")
+      }
+      update.productCode = typeof productCode === "string" ? productCode.trim() : null
+    }
+
+    if (sourceTable !== undefined) {
+      if (typeof sourceTable !== "string" || !sourceTable.trim()) {
+        throw createHttpError(400, "Source table must be a non-empty string")
+      }
+      update.sourceTable = sourceTable.trim()
+    }
+
+    if (description !== undefined) {
+      if (typeof description !== "string" || !description.trim()) {
+        throw createHttpError(400, "Description must be a non-empty string")
+      }
+      update.description = description.trim()
+    }
+
+    if (rawRows !== undefined) {
+      if (!Array.isArray(rawRows)) {
+        throw createHttpError(400, "Raw rows must be an array")
+      }
+      update.rawRows = rawRows
+    }
   }
 
   const issue = await DataQualityIssue.findByIdAndUpdate(
     req.params.id,
-    { status },
+    update,
     { returnDocument: "after" }
   ).lean()
 

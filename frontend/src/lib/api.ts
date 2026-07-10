@@ -1,7 +1,9 @@
 import type {
   DataQualityIssue,
+  DataQualityIssueUpdateInput,
   ExceptionDetailResponse,
   ExceptionItem,
+  ExceptionUpdateInput,
   User,
 } from "@/types"
 
@@ -84,11 +86,13 @@ export function getExceptionDetail(id: string) {
 
 export function updateExceptionStatus(
   id: string,
-  status: "acknowledged" | "resolved"
+  update: ExceptionUpdateInput | ExceptionUpdateInput["status"]
 ) {
+  const payload = typeof update === "string" ? { status: update } : update
+
   return request<{ exception: ExceptionItem }>(`/api/exceptions/${id}`, {
     method: "PATCH",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   }).then((payload) => payload.exception)
 }
 
@@ -110,11 +114,13 @@ export function getDataQualityIssueDetail(id: string) {
 
 export function updateDataQualityIssueStatus(
   id: string,
-  status: "acknowledged" | "resolved"
+  update: DataQualityIssueUpdateInput | DataQualityIssueUpdateInput["status"]
 ) {
+  const payload = typeof update === "string" ? { status: update } : update
+
   return request<{ issue: DataQualityIssue }>(`/api/data-quality-issues/${id}`, {
     method: "PATCH",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   }).then((payload) => payload.issue)
 }
 

@@ -51,7 +51,7 @@ describe("App", () => {
 
     render(<App />)
 
-    expect(await screen.findByRole("heading", { name: /operator sign-in/i })).toBeInTheDocument()
+    expect(await screen.findByRole("heading", { name: /^sign in$/i })).toBeInTheDocument()
     await waitFor(() => {
       expect(window.location.pathname).toBe("/")
     })
@@ -127,9 +127,7 @@ describe("App", () => {
     await userEvent.type(screen.getByLabelText(/password/i), "123456")
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }))
 
-    expect(
-      await screen.findByRole("heading", { level: 2, name: /operations inbox/i })
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/open reviews/i)).toBeInTheDocument()
     expect(
       await screen.findByRole("button", { name: /view details for fg-011/i })
     ).toBeInTheDocument()
@@ -180,7 +178,7 @@ describe("App", () => {
   test("switches to data-quality mode, opens detail, and updates issue status without reload", async () => {
     setPath("/dashboard")
 
-    const issue = {
+    let issue = {
       id: "dq-1",
       issueType: "blank_planned_units",
       date: "2017-01-26",
@@ -218,12 +216,14 @@ describe("App", () => {
       }
 
       if (url.includes("/api/data-quality-issues/dq-1") && init?.method === "PATCH") {
+        const nextStatus = JSON.parse(String(init.body)).status
+        issue = {
+          ...issue,
+          status: nextStatus,
+        }
         return jsonResponse({
           body: {
-            issue: {
-              ...issue,
-              status: "resolved",
-            },
+            issue,
           },
         })
       }
@@ -245,14 +245,14 @@ describe("App", () => {
 
     render(<App />)
 
-    await userEvent.click(await screen.findByRole("button", { name: /data quality/i }))
+    await userEvent.click(await screen.findByRole("button", { name: /^Data quality$/i }))
     expect(
       await screen.findByRole("button", { name: /view details for fg-012/i })
     ).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: /view details for fg-012/i }))
 
-    const panel = await screen.findByRole("complementary", { name: /issue detail/i })
+    const panel = await screen.findByRole("dialog", { name: /issue detail/i })
     expect(within(panel).getByText(/plan row has a blank planned_units value/i)).toBeInTheDocument()
     expect(
       within(panel).getByText(
@@ -266,6 +266,12 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(within(panel).getAllByText(/resolved/i).length).toBeGreaterThan(0)
+    })
+
+    await userEvent.click(within(panel).getByRole("button", { name: /reopen/i }))
+
+    await waitFor(() => {
+      expect(within(panel).getAllByText(/^open$/i).length).toBeGreaterThan(0)
     })
   })
 })
