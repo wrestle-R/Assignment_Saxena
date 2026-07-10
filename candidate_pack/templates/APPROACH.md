@@ -14,10 +14,6 @@ My order was roughly:
 6. Build the dashboard filters, detail panel, and status actions.
 7. Clean up the layout so it felt quiet and readable instead of busy.
 
-## Process flow
-
-![alt text](image-1.png)
-
 ## Data decisions
 
 The source data had a few real issues, and I handled them instead of pretending they were clean.

@@ -4,7 +4,7 @@ I used AI heavily on this assignment, but I still reviewed the output and change
 
 ## Tools used
 
-- GitHub Copilot Pro for quick scaffolding, small refactors, and copy suggestions.
+- GitHub Copilot Pro(Student version) for quick scaffolding, small refactors, and copy suggestions.
 - OpenCode with DeepSeek V4 Flash for backend and seed logic help.
 - Antigravity with Gemini 3.1 Pro for frontend layout ideas and visual cleanup.
 
